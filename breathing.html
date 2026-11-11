@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#EAF5FC">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@800;900&display=swap">
+<title>בועת נשימה</title>
+<style>
+:root{
+  --ink:#14203A; --paper:#FFFFFF; --sky:#EAF5FC; --sun:#D4551F; --teal:#0B6672; --green:#1B7745;
+  --text:"Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+  --title:"Heebo","Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+  --bubble:min(50vh, 78vw);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--sky); color:var(--ink); font-family:var(--text);
+  display:flex; flex-direction:column; align-items:center;
+  height:100vh; height:100dvh; overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+header{width:100%; max-width:1100px; padding:clamp(14px,3vh,28px) 24px 0; display:flex; align-items:baseline; justify-content:space-between; gap:16px}
+h1{font-family:var(--title); font-weight:900; font-size:clamp(30px,5.4vh,44px); line-height:1}
+.sub{font-size:clamp(17px,2.8vh,22px); font-weight:500; color:var(--teal)}
+
+.stage{flex:1; width:100%; display:flex; align-items:center; justify-content:center; position:relative; min-height:0}
+.guide{
+  position:absolute; width:var(--bubble); height:var(--bubble); border-radius:50%;
+  border:3px dashed rgba(11,102,114,.28);
+}
+.bubble{
+  position:relative; width:var(--bubble); height:var(--bubble); border-radius:50%;
+  background:radial-gradient(circle at 38% 32%, #FFFFFF 0%, #FFFFFF 28%, #CFE8F5 100%);
+  border:6px solid rgba(11,102,114,.85);
+  transform:scale(.6); will-change:transform;
+  transition:transform 1.2s cubic-bezier(.45,0,.55,1);
+  display:flex; align-items:center; justify-content:center;
+}
+.bubble::after{ /* little shine, like a real soap bubble */
+  content:""; position:absolute; top:13%; right:20%; width:18%; height:11%;
+  border-radius:50%; background:rgba(255,255,255,.95); transform:rotate(30deg);
+}
+/* text lives outside the scaled bubble so it never shrinks */
+.inside{position:absolute; display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; pointer-events:none}
+.phase{font-family:var(--title); font-weight:900; font-size:calc(var(--bubble) * .12); line-height:1.05; color:var(--ink)}
+.count{font-size:calc(var(--bubble) * .1); font-weight:700; color:var(--teal); font-variant-numeric:tabular-nums; min-height:1.1em}
+.hint{text-wrap:balance; font-size:clamp(17px,2.9vh,24px); font-weight:500; color:var(--ink); opacity:.8; min-height:1.3em; text-align:center; padding:0 16px}
+
+.star{position:absolute; width:min(34vh,56vw); height:min(34vh,56vw); display:none}
+.star svg{width:100%; height:100%; overflow:visible}
+.done .star{display:block; animation:pop .9s cubic-bezier(.2,1.4,.4,1) both}
+.done .bubble,.done .guide,.done .inside{display:none}
+.spark{transform-origin:100px 100px; animation:spark 1s ease-out .25s both}
+@keyframes pop{0%{transform:scale(0) rotate(-40deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes spark{0%{opacity:0;transform:scale(.4)}40%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+
+footer{width:100%; display:flex; flex-direction:column; align-items:center; gap:clamp(10px,2vh,18px); padding:0 24px clamp(18px,4vh,36px)}
+.rounds{display:flex; align-items:center; gap:14px; font-size:clamp(18px,3vh,24px); font-weight:500}
+.dots{display:flex; gap:10px}
+.dot{width:18px; height:18px; border-radius:50%; border:3px solid var(--teal); background:transparent; transition:background .4s}
+.dot.on{background:var(--teal)}
+.dot.now{border-color:var(--sun)}
+.msg{font-family:var(--title); font-weight:900; font-size:clamp(28px,5.4vh,46px); color:var(--green); text-align:center; display:none; line-height:1.15}
+.done .msg{display:block}
+.done .rounds{display:none}
+button{
+  font-family:var(--text); font-weight:700; font-size:clamp(22px,3.8vh,30px);
+  min-height:72px; min-width:240px; padding:0 44px; border-radius:999px; border:0;
+  background:var(--teal); color:#fff; cursor:pointer; touch-action:manipulation;
+}
+button:active{transform:translateY(2px)}
+button:focus-visible{outline:4px solid var(--sun); outline-offset:4px}
+.running button{visibility:hidden}
+
+@media (max-width:600px){
+  header{flex-direction:column; align-items:center; text-align:center; gap:6px}
+  :root{--bubble:min(44vh, 80vw)}
+}
+@media (prefers-reduced-motion:reduce){
+  .bubble{transform:scale(.8)!important; transition:background-color 1s linear!important}
+  .bubble.in{background:#CFE8F5}
+  .done .star{animation:none}
+  .spark{animation:none; opacity:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>בועת נשימה</h1>
+  <div class="sub">נושמים יחד עם הבועה</div>
+</header>
+
+<main class="stage" id="stage">
+  <div class="guide" aria-hidden="true"></div>
+  <div class="bubble" id="bubble" aria-hidden="true"></div>
+  <div class="inside" aria-live="polite">
+    <div class="phase" id="phase">מוכנים?</div>
+    <div class="count" id="count"></div>
+  </div>
+  <div class="star" aria-hidden="true">
+    <svg viewBox="0 0 200 200">
+      <g class="spark" fill="#0B6672">
+        <circle cx="100" cy="6" r="6"/><circle cx="190" cy="74" r="6"/><circle cx="156" cy="184" r="6"/>
+        <circle cx="44" cy="184" r="6"/><circle cx="10" cy="74" r="6"/>
+      </g>
+      <path d="M100 22 L122 74 L178 79 L136 116 L149 171 L100 142 L51 171 L64 116 L22 79 L78 74 Z"
+            fill="#D4551F" stroke="#14203A" stroke-width="6" stroke-linejoin="round"/>
+      <circle cx="84" cy="104" r="6" fill="#14203A"/><circle cx="116" cy="104" r="6" fill="#14203A"/>
+      <path d="M86 122 Q100 134 114 122" fill="none" stroke="#14203A" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  </div>
+</main>
+
+<footer>
+  <div class="hint" id="hint">כשמוכנים, לוחצים על הכפתור</div>
+  <div class="rounds"><span id="roundTxt">5 סבבים</span><div class="dots" id="dots"></div></div>
+  <div class="msg" id="msg">כל הכבוד, אפשר להתחיל</div>
+  <button id="btn" type="button">מתחילים</button>
+</footer>
+
+<script>
+(function(){
+  var ROUNDS = 5, IN = 4, OUT = 6;
+  // ?speed=10 runs the cycle 10x faster (for rehearsal and testing only)
+  var speed = parseFloat(new URLSearchParams(location.search).get('speed')) || 1;
+  var body = document.body, bubble = document.getElementById('bubble');
+  var phase = document.getElementById('phase'), count = document.getElementById('count');
+  var hint = document.getElementById('hint'), btn = document.getElementById('btn');
+  var roundTxt = document.getElementById('roundTxt'), dotsEl = document.getElementById('dots');
+  var timers = [], dots = [];
+  for (var i = 0; i < ROUNDS; i++){ var d = document.createElement('span'); d.className = 'dot'; dotsEl.appendChild(d); dots.push(d); }
+
+  function later(fn, s){ timers.push(setTimeout(fn, s * 1000 / speed)); }
+  function setDots(r){ dots.forEach(function(d, i){ d.className = 'dot' + (i < r ? ' on' : '') + (i === r ? ' now' : ''); }); }
+  function ticker(total){
+    for (var s = 0; s < total; s++){ (function(n){ later(function(){ count.textContent = String(total - n); }, n); })(s); }
+  }
+  function breath(r){
+    if (r >= ROUNDS){ return finish(); }
+    setDots(r);
+    roundTxt.textContent = 'סבב ' + (r + 1) + ' מתוך ' + ROUNDS;
+    phase.textContent = 'שואפים';
+    hint.textContent = 'מכניסים אוויר דרך האף';
+    bubble.classList.add('in');
+    bubble.style.transitionDuration = (IN / speed) + 's';
+    bubble.style.transform = 'scale(1)';
+    ticker(IN);
+    later(function(){
+      phase.textContent = 'נושפים';
+      hint.textContent = 'מוציאים לאט, כמו על מרק חם';
+      bubble.classList.remove('in');
+      bubble.style.transitionDuration = (OUT / speed) + 's';
+      bubble.style.transform = 'scale(.6)';
+      ticker(OUT);
+      later(function(){ breath(r + 1); }, OUT);
+    }, IN);
+  }
+  function finish(){
+    setDots(ROUNDS);
+    body.classList.remove('running'); body.classList.add('done');
+    hint.textContent = 'חמש נשימות רגועות, איזה יופי';
+    btn.textContent = 'עוד פעם';
+    btn.focus({preventScroll:true});
+  }
+  function start(){
+    timers.forEach(clearTimeout); timers = [];
+    body.classList.remove('done'); body.classList.add('running');
+    count.textContent = '';
+    breath(0);
+  }
+  btn.addEventListener('click', start);
+  setDots(-1);
+})();
+</script>
+</body>
+</html>

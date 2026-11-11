@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#EAF5FC">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@800;900&display=swap">
+<title>מחשבון BMI</title>
+<style>
+:root{
+  --ink:#14203A; --paper:#FFFFFF; --sky:#EAF5FC; --sun:#D4551F; --teal:#0B6672; --green:#1B7745;
+  --line:rgba(11,102,114,.18);
+  --text:"Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+  --title:"Heebo","Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+  --b1:#5E9EA6; --b2:#1B7745; --b3:#E39A72; --b4:#D4551F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--sky); color:var(--ink); font-family:var(--text);
+  height:100vh; height:100dvh; overflow:hidden; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; justify-content:center; padding:clamp(14px,3vh,32px) clamp(16px,3vw,40px);
+}
+input{font-family:var(--text); color:var(--ink)}
+:focus-visible{outline:4px solid var(--sun); outline-offset:3px}
+.wrap{width:100%; max-width:1180px; height:100%; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:clamp(18px,3vw,44px); align-items:center}
+aside{display:flex; flex-direction:column; gap:clamp(14px,3vh,26px)}
+h1{font-family:var(--title); font-weight:900; font-size:clamp(34px,6.4vh,52px); line-height:1}
+h1 span{color:var(--teal)}
+.field{background:var(--paper); border-radius:20px; padding:clamp(14px,2.6vh,22px) clamp(16px,2vw,24px); display:flex; flex-direction:column; gap:clamp(8px,1.6vh,14px)}
+.ftop{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.ftop label{font-weight:700; font-size:clamp(20px,3.4vh,26px)}
+.num{display:flex; align-items:center; gap:6px; background:var(--sky); border-radius:14px; padding:0 14px; border:3px solid transparent}
+.num:focus-within{border-color:var(--sun)}
+.num input{width:3.4em; border:0; background:transparent; font-family:var(--title); font-weight:900; font-size:clamp(28px,5vh,38px); min-height:clamp(52px,8.4vh,64px); text-align:left; direction:ltr; font-variant-numeric:tabular-nums; -moz-appearance:textfield}
+.num input::-webkit-outer-spin-button,.num input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+.num input:focus{outline:none}
+.num span{font-size:18px; font-weight:700; opacity:.7}
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:44px; background:transparent; cursor:pointer; direction:ltr}
+input[type=range]::-webkit-slider-runnable-track{height:12px; border-radius:6px; background:linear-gradient(to right, var(--teal) var(--p,50%), #C9DCE3 var(--p,50%))}
+input[type=range]::-moz-range-track{height:12px; border-radius:6px; background:#C9DCE3}
+input[type=range]::-moz-range-progress{height:12px; border-radius:6px; background:var(--teal)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:38px; height:38px; margin-top:-13px; border-radius:50%; background:var(--paper); border:6px solid var(--teal); box-shadow:0 2px 3px rgba(20,32,58,.25)}
+input[type=range]::-moz-range-thumb{width:28px; height:28px; border-radius:50%; background:var(--paper); border:6px solid var(--teal)}
+.range-ends{display:flex; justify-content:space-between; font-size:14px; opacity:.6; margin-top:-6px; direction:ltr}
+
+main{background:var(--paper); border-radius:24px; padding:clamp(18px,3.4vh,32px) clamp(18px,2.6vw,36px); display:flex; flex-direction:column; gap:clamp(10px,2vh,18px)}
+.k{font-size:clamp(18px,3vh,22px); font-weight:700; color:var(--teal)}
+.big{display:flex; align-items:baseline; gap:16px; flex-wrap:wrap}
+.val{font-family:var(--title); font-weight:900; font-size:clamp(84px,19vh,150px); line-height:.9; font-variant-numeric:tabular-nums; direction:ltr}
+.cat{font-family:var(--title); font-weight:900; font-size:clamp(28px,5.2vh,42px); line-height:1.1}
+.range{font-size:clamp(16px,2.6vh,19px); font-weight:500; opacity:.8}
+.scale{position:relative; margin-top:clamp(18px,3.4vh,30px)}
+.bands{display:flex; height:clamp(24px,4vh,32px); border-radius:10px; overflow:hidden; direction:ltr}
+.bands i{display:block; height:100%; opacity:.35; transition:opacity .25s}
+.bands i.on{opacity:1}
+.ticks{position:relative; height:24px; direction:ltr; font-size:15px; font-weight:700}
+.ticks span{position:absolute; top:4px; transform:translateX(-50%); font-variant-numeric:tabular-nums}
+.names{display:flex; direction:ltr; margin-top:2px}
+.names div{text-align:center; font-size:clamp(14px,2.3vh,17px); font-weight:500; line-height:1.15; padding:0 2px; direction:rtl}
+.names div.on{font-weight:700}
+.marker{position:absolute; top:clamp(-22px,-3.4vh,-16px); width:0; height:0; transition:left .35s cubic-bezier(.3,.7,.3,1)}
+.marker::before{content:""; position:absolute; left:-14px; top:0; border:14px solid transparent; border-top:16px solid var(--ink); border-bottom:0}
+.marker::after{content:""; position:absolute; left:-2px; top:14px; width:4px; height:clamp(30px,5vh,40px); background:var(--ink); border-radius:2px}
+.formula{font-size:clamp(16px,2.6vh,19px); font-weight:500; background:var(--sky); border-radius:12px; padding:10px 14px}
+.formula b{font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate; display:inline-block}
+.note{font-size:clamp(15px,2.4vh,17px); line-height:1.35; opacity:.85; display:flex; gap:10px; align-items:flex-start}
+.note svg{flex:none; width:22px; height:22px; margin-top:1px}
+
+@media (max-width:820px){
+  body{height:auto; min-height:100dvh; overflow:auto; display:block}
+  .wrap{grid-template-columns:minmax(0,1fr); height:auto; gap:16px}
+  .names div{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <h1>מחשבון <span>BMI</span></h1>
+    <div class="field">
+      <div class="ftop"><label for="hN">גובה</label><div class="num"><input id="hN" type="number" inputmode="numeric" min="120" max="220" step="1"><span>ס״מ</span></div></div>
+      <input id="hR" type="range" min="120" max="220" step="1" aria-label="גובה בסנטימטרים">
+      <div class="range-ends"><span>120</span><span>220</span></div>
+    </div>
+    <div class="field">
+      <div class="ftop"><label for="wN">משקל</label><div class="num"><input id="wN" type="number" inputmode="decimal" min="30" max="200" step="0.5"><span>ק״ג</span></div></div>
+      <input id="wR" type="range" min="30" max="200" step="0.5" aria-label="משקל בקילוגרמים">
+      <div class="range-ends"><span>30</span><span>200</span></div>
+    </div>
+  </aside>
+
+  <main aria-live="polite">
+    <div class="k">ה-BMI שלך</div>
+    <div class="big"><div class="val" id="val">0</div><div><div class="cat" id="cat"></div><div class="range" id="rng"></div></div></div>
+    <div class="scale">
+      <div class="marker" id="marker" aria-hidden="true"></div>
+      <div class="bands" id="bands"></div>
+      <div class="ticks" id="ticks"></div>
+      <div class="names" id="names"></div>
+    </div>
+    <div class="formula">החישוב: משקל בק״ג חלקי הגובה במטרים בריבוע. <b id="calc" dir="ltr"></b></div>
+    <p class="note"><svg viewBox="0 0 24 24" fill="none" stroke="#0B6672" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.4v.2"/></svg>מדד כללי למבוגרים. הוא לא מבחין בין שריר לשומן, ואינו אבחנה.</p>
+  </main>
+</div>
+
+<script>
+(function(){
+  // WHO adult categories (see bmi-sources.md). Classification uses the displayed one-decimal value.
+  var MIN = 13, MAX = 40;
+  var CATS = [
+    {from:MIN, to:18.5, n:'תת משקל', r:'מתחת ל-18.5', c:'var(--b1)'},
+    {from:18.5, to:25, n:'משקל תקין', r:'18.5 עד 24.9', c:'var(--b2)'},
+    {from:25, to:30, n:'עודף משקל', r:'25 עד 29.9', c:'var(--b3)'},
+    {from:30, to:MAX, n:'השמנה', r:'30 ומעלה', c:'var(--b4)'}
+  ];
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = 'bmi-v1', S = {h:170, w:70};
+  try { var st = JSON.parse(localStorage.getItem(KEY)); if (st && st.h && st.w) S = st; } catch (e) {}
+  function pos(v){ return (Math.max(MIN, Math.min(MAX, v)) - MIN) / (MAX - MIN) * 100; }
+
+  CATS.forEach(function(c){
+    var w = (c.to - c.from) / (MAX - MIN) * 100;
+    var i = document.createElement('i'); i.style.width = w + '%'; i.style.background = c.c; $('bands').appendChild(i);
+    var d = document.createElement('div'); d.style.width = w + '%'; d.textContent = c.n; $('names').appendChild(d);
+  });
+  [18.5, 25, 30].forEach(function(t){ var s = document.createElement('span'); s.style.left = pos(t) + '%'; s.textContent = t; $('ticks').appendChild(s); });
+
+  function fill(r){ r.style.setProperty('--p', ((r.value - r.min) / (r.max - r.min) * 100) + '%'); }
+  function paint(){
+    var m = S.h / 100, bmi = S.w / (m * m), shown = Math.round(bmi * 10) / 10;
+    var k = shown < 18.5 ? 0 : shown < 25 ? 1 : shown < 30 ? 2 : 3;
+    $('val').textContent = shown.toFixed(1);
+    $('val').style.color = k === 1 ? 'var(--green)' : k === 0 ? 'var(--teal)' : 'var(--sun)';
+    $('cat').textContent = CATS[k].n;
+    $('rng').textContent = 'הטווח: ' + CATS[k].r;
+    $('marker').style.left = pos(shown) + '%';
+    document.querySelectorAll('.bands i').forEach(function(i, j){ i.classList.toggle('on', j === k); });
+    document.querySelectorAll('.names div').forEach(function(d, j){ d.classList.toggle('on', j === k); });
+    $('calc').textContent = S.w + ' ÷ (' + m.toFixed(2) + ' × ' + m.toFixed(2) + ') = ' + shown.toFixed(1);
+    document.body.dataset.bmi = shown.toFixed(1); document.body.dataset.cat = CATS[k].n;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
+  }
+  function bind(numEl, rangeEl, key, lo, hi){
+    numEl.value = S[key]; rangeEl.value = S[key]; fill(rangeEl);
+    rangeEl.addEventListener('input', function(){ S[key] = +rangeEl.value; numEl.value = S[key]; fill(rangeEl); paint(); });
+    numEl.addEventListener('input', function(){
+      var v = parseFloat(numEl.value);
+      if (isNaN(v) || v < lo || v > hi) return;    // wait until a sensible number is typed
+      S[key] = v; rangeEl.value = v; fill(rangeEl); paint();
+    });
+    numEl.addEventListener('blur', function(){ numEl.value = S[key]; });
+  }
+  bind($('hN'), $('hR'), 'h', 120, 220);
+  bind($('wN'), $('wR'), 'w', 30, 200);
+  paint();
+})();
+</script>
+</body>
+</html>

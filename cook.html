@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#EAF5FC">
+<meta name="format-detection" content="telephone=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@800;900&display=swap">
+<title>מה מבשלים היום</title>
+<style>
+:root{
+  --ink:#14203A; --paper:#FFFFFF; --sky:#EAF5FC; --sun:#D4551F; --teal:#0B6672; --green:#1B7745;
+  --line:rgba(11,102,114,.18);
+  --text:"Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+  --title:"Heebo","Assistant",'Arial Hebrew','Helvetica Neue',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--sky); color:var(--ink); font-family:var(--text);
+  height:100vh; height:100dvh; overflow:hidden; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; justify-content:center; padding:clamp(14px,2.6vh,28px) clamp(16px,2.6vw,36px);
+}
+button{font-family:var(--text); color:var(--ink); cursor:pointer; touch-action:manipulation}
+:focus-visible{outline:4px solid var(--sun); outline-offset:3px}
+.wrap{width:100%; height:100%; max-width:1240px; display:grid; grid-template-columns:minmax(0,400px) minmax(0,1fr); gap:clamp(16px,2.2vw,28px)}
+aside{display:flex; flex-direction:column; gap:clamp(8px,1.6vh,14px); min-height:0}
+h1{font-family:var(--title); font-weight:900; font-size:clamp(30px,5.6vh,44px); line-height:1}
+h1 span{color:var(--teal)}
+.lead{font-size:clamp(16px,2.6vh,19px); font-weight:500; line-height:1.3}
+.chips{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(6px,1vh,8px); align-content:start}
+.chip{display:flex; align-items:center; justify-content:center; gap:6px; min-height:clamp(42px,6.4vh,52px); padding:2px 8px; border-radius:999px; border:3px solid var(--line); background:var(--paper);
+  font-weight:700; font-size:clamp(15px,2.4vh,18px); line-height:1.05; text-align:center; transition:background .15s, border-color .15s}
+.chip svg{width:16px; height:16px; flex:none; display:none}
+.chip[aria-pressed="true"]{background:var(--teal); border-color:var(--teal); color:#fff}
+.chip[aria-pressed="true"] svg{display:block}
+.chip:hover{border-color:var(--teal)}
+.tools{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:15px; font-weight:500}
+.tools .n{font-weight:700; color:var(--teal)}
+.tools button{border:0; background:none; font-weight:700; font-size:15px; color:var(--teal); text-decoration:underline; min-height:44px; padding:0 6px}
+.staples{font-size:14px; opacity:.7}
+
+main{background:var(--paper); border-radius:20px; padding:clamp(14px,2.4vh,22px) clamp(16px,2vw,24px); display:flex; flex-direction:column; gap:clamp(8px,1.4vh,12px); min-height:0; overflow:auto}
+.gh{display:flex; align-items:baseline; gap:10px; font-family:var(--title); font-weight:900; font-size:clamp(22px,3.8vh,30px); line-height:1.1}
+.gh .c{font-family:var(--text); font-weight:700; font-size:clamp(15px,2.4vh,18px); color:#fff; background:var(--green); border-radius:999px; padding:2px 12px; align-self:center}
+.gh.one .c{background:var(--teal)}
+.gh .s{font-family:var(--text); font-weight:500; font-size:15px; opacity:.7}
+.cards{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(6px,1.2vh,10px)}
+.card{border-radius:14px; padding:clamp(8px,1.4vh,12px) 12px; background:#E6F3EB; display:flex; flex-direction:column; gap:3px; animation:in .35s ease-out both}
+.card.one{background:var(--sky)}
+.card.one .ing{opacity:1; color:rgba(20,32,58,.8)}
+.card h3{font-weight:700; font-size:clamp(17px,2.8vh,20px); line-height:1.15}
+.card .top{display:flex; align-items:flex-start; justify-content:space-between; gap:6px}
+.card .ing{font-size:14px; line-height:1.3; opacity:.8}
+.card .how{font-size:14px; line-height:1.28}
+.miss{position:relative; display:inline-flex; vertical-align:middle; align-items:center; gap:4px; margin:1px 0; border:0; border-radius:999px; background:var(--paper); color:var(--sun); font-weight:700; font-size:14px; padding:2px 9px; min-height:28px; white-space:nowrap; opacity:1}
+.miss::after{content:""; position:absolute; inset:-8px -2px}
+.miss svg{width:13px; height:13px}
+.miss:hover{background:#FBEDE6}
+.empty{font-size:17px; opacity:.75; padding:6px 2px}
+.more{border:0; background:var(--sky); border-radius:12px; min-height:46px; font-weight:700; font-size:16px; color:var(--teal); padding:0 16px; align-self:flex-start}
+.rest .card{background:#F4F7F9}
+@keyframes in{0%{opacity:0; transform:translateY(6px)}100%{opacity:1; transform:none}}
+
+@media (max-width:820px){
+  body{height:auto; min-height:100dvh; overflow:auto; display:block}
+  .wrap{grid-template-columns:minmax(0,1fr); height:auto}
+  main{overflow:visible}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .gh{flex-wrap:wrap} .gh .s{flex-basis:100%}
+  .chips{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside>
+    <h1>מה <span>מבשלים</span> היום?</h1>
+    <p class="lead">מסמנים מה יש במטבח, ורואים מה אפשר להכין עכשיו.</p>
+    <div class="chips" id="chips"></div>
+    <div class="tools"><span>מסומנים <span class="n" id="nSel">0</span> מצרכים</span><span><button type="button" id="clear">לנקות הכל</button> <button type="button" id="ex">דוגמה</button></span></div>
+    <p class="staples">מלח, שמן ותבלינים יש בכל בית, אז לא צריך לסמן אותם.</p>
+  </aside>
+  <main id="out" aria-live="polite"></main>
+</div>
+
+<script>
+(function(){
+  var ING = ['ביצים', 'עגבניות', 'מלפפונים', 'בצל', 'שום', 'אורז', 'פסטה', 'תפוחי אדמה', 'עדשים', 'חזה עוף', 'גבינה לבנה',
+             'גבינה צהובה', 'לחם', 'רסק עגבניות', 'פלפל', 'גזר', 'לימון', 'חומוס', 'טחינה', 'קמח', 'שמנת', 'פטרוזיליה'];
+  var DEFAULT = ['ביצים', 'עגבניות', 'מלפפונים', 'בצל', 'שום', 'לחם', 'גבינה צהובה', 'לימון', 'פטרוזיליה'];
+  var DISHES = [
+    {n:'שקשוקה', i:['ביצים', 'עגבניות', 'בצל', 'שום', 'רסק עגבניות'], h:'מטגנים בצל ושום, מבשלים עם עגבניות ורסק, ושוברים פנימה ביצים.'},
+    {n:'חביתת ירק', i:['ביצים', 'בצל', 'פטרוזיליה'], h:'טורפים ביצים עם בצל ופטרוזיליה קצוצים ומטגנים משני הצדדים.'},
+    {n:'פסטה ברוטב עגבניות', i:['פסטה', 'עגבניות', 'רסק עגבניות', 'שום'], h:'מבשלים רוטב משום, עגבניות ורסק, ומערבבים עם הפסטה.'},
+    {n:'מג׳דרה', i:['אורז', 'עדשים', 'בצל'], h:'מבשלים עדשים ואורז יחד, ומעל הרבה בצל מטוגן עד שהוא שחום.'},
+    {n:'מרק עדשים', i:['עדשים', 'בצל', 'גזר', 'שום'], h:'מבשלים עדשים כתומות עם בצל, גזר ושום עד שהן מתפרקות, וטוחנים.'},
+    {n:'עוף בתנור עם תפוחי אדמה', i:['חזה עוף', 'תפוחי אדמה', 'בצל', 'שום'], h:'מסדרים בתבנית עוף, תפוחי אדמה, בצל ושום, ואופים כשעה.'},
+    {n:'אורז עם ירקות', i:['אורז', 'גזר', 'בצל', 'פלפל'], h:'מאדים בצל, גזר ופלפל, מוסיפים אורז ומים ומבשלים מכוסה.'},
+    {n:'סלט ישראלי', i:['עגבניות', 'מלפפונים', 'בצל', 'לימון'], h:'קוצצים דק עגבניות, מלפפונים ובצל, ומתבלים בלימון, שמן ומלח.'},
+    {n:'פשטידת גבינות', i:['ביצים', 'גבינה לבנה', 'גבינה צהובה', 'שמנת', 'קמח'], h:'מערבבים הכל בקערה, שופכים לתבנית ואופים עד שמזהיב.'},
+    {n:'טוסט גבינה צהובה', i:['לחם', 'גבינה צהובה'], h:'שמים גבינה בין שתי פרוסות ומכניסים לטוסטר עד שנמס.'},
+    {n:'חומוס ביתי', i:['חומוס', 'טחינה', 'לימון', 'שום'], h:'טוחנים גרגרי חומוס מבושלים עם טחינה, לימון, שום וקצת מים.'},
+    {n:'טחינה ירוקה', i:['טחינה', 'לימון', 'שום', 'פטרוזיליה'], h:'מערבבים טחינה גולמית עם מים, לימון, שום ופטרוזיליה קצוצה.'},
+    {n:'שניצל ביתי', i:['חזה עוף', 'ביצים', 'קמח', 'לחם'], h:'טובלים חזה עוף בקמח, בביצה ובפירורים מלחם יבש, ומטגנים.'},
+    {n:'תפוחי אדמה בתנור', i:['תפוחי אדמה', 'שום'], h:'חותכים לפלחים, מערבבים עם שמן, שום ומלח, ואופים עד שמשחים.'},
+    {n:'פירה', i:['תפוחי אדמה', 'שמנת'], h:'מבשלים תפוחי אדמה עד שהם רכים ומועכים עם שמנת ומלח.'},
+    {n:'פסטה ברוטב שמנת', i:['פסטה', 'שמנת', 'גבינה צהובה', 'שום'], h:'מחממים שמנת עם שום וגבינה עד שנמס, ומערבבים עם הפסטה.'},
+    {n:'מרק ירקות', i:['גזר', 'בצל', 'תפוחי אדמה', 'פטרוזיליה'], h:'מבשלים ירקות חתוכים במים עם מלח כחצי שעה, פטרוזיליה בסוף.'},
+    {n:'לביבות תפוחי אדמה', i:['תפוחי אדמה', 'בצל', 'ביצים', 'קמח'], h:'מגררים תפוחי אדמה ובצל, מוסיפים ביצה וקמח, ומטגנים לביבות.'},
+    {n:'פלפלים ממולאים', i:['פלפל', 'אורז', 'בצל', 'רסק עגבניות'], h:'ממלאים פלפלים באורז ובצל, ומבשלים בסיר ברוטב מרסק עגבניות.'},
+    {n:'סלט גזר מרוקאי', i:['גזר', 'שום', 'לימון'], h:'מבשלים פרוסות גזר עד שהן רכות, ומתבלים בשום, לימון וכמון.'},
+    {n:'חביתה וסלט קצוץ', i:['ביצים', 'עגבניות', 'מלפפונים'], h:'ארוחת בוקר ישראלית: חביתה ולידה סלט עגבניות ומלפפונים.'},
+    {n:'כריך גבינה לבנה וירקות', i:['לחם', 'גבינה לבנה', 'מלפפונים', 'עגבניות'], h:'מורחים גבינה לבנה על לחם ומוסיפים פרוסות עגבנייה ומלפפון.'},
+    {n:'חזה עוף בלימון ושום', i:['חזה עוף', 'לימון', 'שום'], h:'משרים חזה עוף בלימון ושום, וצולים במחבת כמה דקות מכל צד.'},
+    {n:'לחם בביצה', i:['לחם', 'ביצים'], h:'טובלים פרוסות לחם בביצה טרופה ומטגנים עד שמזהיבות.'},
+    {n:'מוקפץ עוף וירקות', i:['חזה עוף', 'פלפל', 'גזר', 'בצל'], h:'מקפיצים רצועות עוף על אש גבוהה ומוסיפים ירקות חתוכים דק.'}
+  ];
+  var KEY = 'cook-v1';
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  var PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+  var have;
+  try { have = JSON.parse(localStorage.getItem(KEY)); } catch (e) { have = null; }
+  if (!Array.isArray(have)) have = DEFAULT.slice();
+  var showRest = false;
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(have)); } catch (e) {} }
+  var $ = function(id){ return document.getElementById(id); };
+
+  function toggle(name){
+    var k = have.indexOf(name);
+    if (k > -1) have.splice(k, 1); else have.push(name);
+    save(); paint();
+  }
+  ING.forEach(function(name){
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.ing = name;
+    b.innerHTML = CHECK + '<span></span>'; b.querySelector('span').textContent = name;
+    b.addEventListener('click', function(){ toggle(name); });
+    $('chips').appendChild(b);
+  });
+
+  function card(d, cls){
+    var c = document.createElement('div'); c.className = 'card' + (cls ? ' ' + cls : ''); c.dataset.dish = d.n;
+    c.innerHTML = '<div class="top"><h3></h3></div><div class="ing"></div><div class="how"></div>';
+    c.querySelector('h3').textContent = d.n;
+    c.querySelector('.ing').textContent = d.i.join(' · ');
+    c.querySelector('.how').textContent = d.h;
+    return c;
+  }
+  function group(title, cls, list, sub){
+    var h = document.createElement('div'); h.className = 'gh' + (cls ? ' ' + cls : '');
+    h.innerHTML = '<span class="t"></span><span class="c"></span>' + (sub ? '<span class="s"></span>' : '');
+    h.querySelector('.t').textContent = title; h.querySelector('.c').textContent = list.length;
+    if (sub) h.querySelector('.s').textContent = sub;
+    return h;
+  }
+  function paint(){
+    document.querySelectorAll('.chip').forEach(function(b){ b.setAttribute('aria-pressed', have.indexOf(b.dataset.ing) > -1 ? 'true' : 'false'); });
+    $('nSel').textContent = have.length;
+    var now = [], one = [], rest = [];
+    DISHES.forEach(function(d){
+      var miss = d.i.filter(function(x){ return have.indexOf(x) < 0; });
+      if (!miss.length) now.push(d); else if (miss.length === 1) one.push({d:d, m:miss[0]}); else rest.push({d:d, m:miss});
+    });
+    rest.sort(function(a, b){ return a.m.length - b.m.length; });
+    var out = $('out'); out.innerHTML = '';
+    out.appendChild(group('אפשר עכשיו', '', now));
+    var g1 = document.createElement('div'); g1.className = 'cards';
+    if (!now.length){ var e = document.createElement('div'); e.className = 'empty'; e.textContent = 'עוד אין מנה שלמה. מסמנים עוד כמה מצרכים.'; out.appendChild(e); }
+    now.forEach(function(d){ g1.appendChild(card(d)); });
+    if (now.length) out.appendChild(g1);
+
+    out.appendChild(group('חסר רק דבר אחד', 'one', one, one.length ? 'לחיצה על החסר מסמנת שיש' : ''));
+    var g2 = document.createElement('div'); g2.className = 'cards';
+    one.forEach(function(o){
+      var c = card(o.d, 'one'), ing = c.querySelector('.ing');
+      ing.textContent = '';
+      o.d.i.forEach(function(x, j){
+        if (j) ing.appendChild(document.createTextNode(' · '));
+        if (x !== o.m){ ing.appendChild(document.createTextNode(x)); return; }
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'miss';
+        b.innerHTML = PLUS + '<span></span>'; b.querySelector('span').textContent = 'חסר: ' + x;
+        b.setAttribute('aria-label', 'חסר ' + x + '. לחיצה מסמנת שיש');
+        b.addEventListener('click', function(){ toggle(x); });
+        ing.appendChild(b);
+      });
+      g2.appendChild(c);
+    });
+    if (one.length) out.appendChild(g2);
+    else { var e2 = document.createElement('div'); e2.className = 'empty'; e2.textContent = 'אין כרגע מנה שחסר בה רק מצרך אחד.'; out.appendChild(e2); }
+
+    if (rest.length){
+      var mb = document.createElement('button'); mb.type = 'button'; mb.className = 'more';
+      mb.textContent = showRest ? 'להסתיר את שאר המנות' : 'ועוד ' + rest.length + ' מנות שחסרים בהן שני מצרכים או יותר';
+      mb.addEventListener('click', function(){ showRest = !showRest; paint(); });
+      out.appendChild(mb);
+      if (showRest){
+        var g3 = document.createElement('div'); g3.className = 'cards rest';
+        rest.forEach(function(o){ var c = card(o.d); var m = document.createElement('div'); m.className = 'how'; m.style.color = '#D4551F'; m.style.fontWeight = '700'; m.textContent = 'חסר: ' + o.m.join(', '); c.appendChild(m); g3.appendChild(c); });
+        out.appendChild(g3);
+      }
+    }
+  }
+  $('clear').addEventListener('click', function(){ have = []; save(); paint(); });
+  $('ex').addEventListener('click', function(){ have = DEFAULT.slice(); save(); paint(); });
+  paint();
+})();
+</script>
+</body>
+</html>
