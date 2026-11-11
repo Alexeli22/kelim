@@ -55,9 +55,13 @@ h1 span{color:var(--teal)}
 .trail .home,.trail .away{position:absolute; top:50%; width:14px; height:14px; margin-top:-7px; border-radius:50%; background:var(--teal)}
 .trail .home{right:0} .trail .away{left:0; background:var(--sun)}
 .plane{position:absolute; top:50%; width:34px; height:34px; margin:-17px -17px 0 0; transition:right 1s cubic-bezier(.3,.7,.3,1)}
-.daterow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.dates{display:flex; flex-direction:column; gap:8px}
+.daterow{display:grid; grid-template-columns:62px auto 1fr; align-items:center; gap:10px}
+.daterow .lbl{opacity:1; font-weight:700}
 .daterow input{max-width:100%; font-size:19px; font-weight:700; min-height:52px; padding:0 12px; border:3px solid var(--line); border-radius:14px; background:var(--sky)}
 .day{font-size:17px; font-weight:500}
+.tripspan{background:var(--sky); border-radius:14px; padding:10px 14px; text-align:center; font-size:clamp(18px,2.9vh,21px); font-weight:500}
+.tripspan b{font-family:var(--title); font-weight:900; font-size:1.25em; color:var(--teal)}
 
 /* budget */
 .total{display:flex; align-items:center; justify-content:space-between; gap:10px}
@@ -146,8 +150,11 @@ h1 span{color:var(--teal)}
     <div class="trail" aria-hidden="true"><span class="home"></span><span class="away"></span>
       <svg class="plane" id="plane" viewBox="0 0 48 48"><path d="M6 26 L18 24 L28 10 L33 10 L28 24 L38 23 L42 18 L45 18 L43 25 L45 32 L42 32 L38 27 L28 26 L33 40 L28 40 L18 28 L6 26 Z" fill="#0B6672" transform="scale(-1,1) translate(-48,0)"/></svg>
     </div>
-    <div class="lbl">תאריך הטיסה</div>
-    <div class="daterow"><input id="date" type="date" aria-label="תאריך הטיסה"><span class="day" id="day"></span></div>
+    <div class="dates">
+      <div class="daterow"><label class="lbl" for="date">יוצאים</label><input id="date" type="date" aria-label="תאריך היציאה"><span class="day" id="day"></span></div>
+      <div class="daterow"><label class="lbl" for="end">חוזרים</label><input id="end" type="date" aria-label="תאריך החזרה"><span class="day" id="day2"></span></div>
+    </div>
+    <div class="tripspan" id="span" aria-live="polite"></div>
   </section>
 
   <!-- budget -->
@@ -184,7 +191,7 @@ h1 span{color:var(--teal)}
   function items(list, done){ return list.map(function(t, i){ return {t:t, ok: done.indexOf(i) > -1}; }); }
   function example(){
     return {
-      dest:'רומא', date:inDays(40), total:24000,
+      dest:'רומא', date:inDays(40), end:inDays(44), total:24000,
       cats:[{n:'טיסות', v:7600}, {n:'לינה', v:6500}, {n:'אוכל', v:4000}, {n:'אטרקציות', v:2200}, {n:'קניות', v:1500}],
       cur:0,
       people:[
@@ -198,6 +205,9 @@ h1 span{color:var(--teal)}
   var S;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
   if (!S || !S.people || S.people.length !== 4) S = example();
+  function parse(v){ var p = (v || '').split('-'); return p.length === 3 ? new Date(+p[0], +p[1] - 1, +p[2], 12) : null; }
+  function addDays(v, n){ var d = parse(v) || new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return iso(d); }
+  if (!S.end) S.end = addDays(S.date, 4);
   function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
   var $ = function(id){ return document.getElementById(id); };
@@ -214,7 +224,7 @@ h1 span{color:var(--teal)}
     if (p.length !== 3){ pre.textContent = 'בוחרים'; numEl.textContent = '?'; unit.textContent = 'תאריך'; weeks.textContent = ''; $('day').textContent = ''; return; }
     var t = new Date(+p[0], +p[1] - 1, +p[2], 12), now = new Date(); now.setHours(12, 0, 0, 0);
     var n = Math.round((t - now) / 864e5);
-    $('day').textContent = 'יום ' + DAYS[t.getDay()] + ', ' + t.getDate() + ' ' + MONTHS[t.getMonth()];
+    $('day').textContent = 'יום ' + DAYS[t.getDay()];
     if (n > 2){ pre.textContent = 'עוד'; numEl.textContent = n; unit.textContent = 'ימים'; }
     else if (n === 2){ pre.textContent = 'עוד'; numEl.textContent = '2'; unit.textContent = 'ימים, מחרתיים!'; }
     else if (n === 1){ pre.textContent = 'טסים'; numEl.textContent = 'מחר'; unit.textContent = 'לבדוק דרכונים'; }
@@ -224,6 +234,18 @@ h1 span{color:var(--teal)}
     weeks.textContent = n >= 14 ? ('שזה ' + w + ' שבועות' + (d ? ' ו-' + d + (d === 1 ? ' יום' : ' ימים') : '')) : '';
     var f = Math.max(0, Math.min(1, 1 - n / 90));
     $('plane').style.right = 'calc(' + (f * 100) + '% + ' + (17 - f * 34) + 'px)';
+  }
+
+  /* how long is the trip */
+  function paintSpan(){
+    var a = parse(S.date), b = parse(S.end), el = $('span');
+    $('day2').textContent = b ? 'יום ' + DAYS[b.getDay()] : '';
+    $('end').min = S.date || '';
+    if (!a || !b){ el.textContent = 'בוחרים תאריך יציאה ותאריך חזרה'; return; }
+    var nights = Math.round((b - a) / 864e5), days = nights + 1;
+    var dTxt = days === 1 ? 'יום אחד' : days === 2 ? 'יומיים' : days + ' ימים';
+    var nTxt = nights === 0 ? 'בלי לינה' : nights === 1 ? 'לילה אחד' : nights === 2 ? 'שני לילות' : nights + ' לילות';
+    el.innerHTML = 'סך הכול <b>' + dTxt + '</b> · ' + nTxt;
   }
 
   /* budget */
@@ -304,12 +326,23 @@ h1 span{color:var(--teal)}
   function init(){
     $('dest').value = S.dest;
     $('date').value = S.date;
+    $('end').value = S.end;
     $('total').value = fmt(S.total);
     buildCats(); buildTabs();
-    paintCount(); paintBudget(); paintPack();
+    paintCount(); paintSpan(); paintBudget(); paintPack();
   }
   $('dest').addEventListener('input', function(e){ S.dest = e.target.value; save(); });
-  $('date').addEventListener('input', function(e){ S.date = e.target.value; paintCount(); save(); });
+  $('date').addEventListener('input', function(e){
+    var a = parse(S.date), b = parse(S.end), len = (a && b) ? Math.max(0, Math.round((b - a) / 864e5)) : 4;
+    S.date = e.target.value;
+    if (parse(S.date)){ S.end = addDays(S.date, len); $('end').value = S.end; }
+    paintCount(); paintSpan(); save();
+  });
+  $('end').addEventListener('input', function(e){
+    var v = e.target.value;
+    if (v && parse(S.date) && parse(v) < parse(S.date)){ v = S.date; e.target.value = v; }
+    S.end = v; paintSpan(); save();
+  });
   var tot = $('total');
   tot.addEventListener('input', function(){ S.total = num(tot.value); paintBudget(); save(); });
   tot.addEventListener('focus', function(){ tot.value = S.total || ''; tot.select(); });
